@@ -56,7 +56,7 @@ export const originalDeck = [
   { id: 52, suit: "spades", rank: "A" },
 ];
 
-// Shuffle the deck: Fisher-Yates-Algorithm
+// Shuffle the deck with the Fisher-Yates-Algorithm:
 // function shuffleDeck takes a deck and shuffles it
 // start with the last card (length - 1), loop stops before reaching the first card (i > 0)
 // Math.random: generates floating-point number (Gleitkommazahl) between 0 (incl.) and 1 (excl.)
@@ -71,7 +71,7 @@ export function shuffleDeck(deck) {
   return deck;
 }
 
-// getShuffledDeck
+// Function getShuffledDeck:
 // shuffle a copy of the original deck (using the spread operator to copy all elements)
 export function getShuffledDeck() {
   const shufflingDeckCopy = [...originalDeck];
