@@ -10,14 +10,14 @@ function App() {
   // to the new variable newDeck gets assigned the shuffled deck from 'getShuffledDeck' --> easier to read, inspect, debug
   const handlePlayButton = () => {
     setGameStarted(true);
-    const newDeck = getShuffledDeck();
-    setDeck(newDeck);
+    // let-variable to slice it later
+    let newDeck = getShuffledDeck();
+    const newColumns = [];
 
     // 'i' will act (1) as a counter and (2) as a key component in slicing the deck
     // slice(startIndex, endIndex): new array is created from startIndex up to (but not including) endIndex
     // 'push': newly created array 'column' is added to the array 'newColumns' (will have 7 columns eventually)
     // 'i' iterates from 1 to 7, 'index' iterates from 0 and gets updated with the current 'i' (index = index + i  <=>  index += i)
-    const newColumns = [];
     let index = 0;
     for (let i = 1; i <= 7; i++) {
       const column = newDeck.slice(index, index + i);
@@ -25,7 +25,10 @@ function App() {
       index += i;
     }
 
-    setColumns(newColumns);
+    // Remove the cards that were dealt to the columns from 'newDeck'
+    newDeck = newDeck.slice(index);
+    setDeck(newDeck); // Update the deck state with remaining cards
+    setColumns(newColumns); // Set the columns with the dealt cards
   };
 
   return (
