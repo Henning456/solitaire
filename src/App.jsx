@@ -46,7 +46,7 @@ function App() {
             {/* key={card.id}: idenifier for each element */}
             {deck.map((card) => (
               <div key={card.id}>
-                {card.rank} of {card.suit}
+                {card.rank} of {card.suit} {card.emoji}
               </div>
             ))}
           </div>
@@ -58,7 +58,7 @@ function App() {
               <div key={columnIndex} className="column">
                 {column.map((card) => (
                   <div key={card.id}>
-                    {card.rank} of {card.suit}
+                    {card.rank} of {card.suit} {card.emoji}
                   </div>
                 ))}
               </div>
