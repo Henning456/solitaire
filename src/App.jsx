@@ -1,6 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 import { getShuffledDeck } from "./utils/deck";
+import Card from "./components/Card";
 
 function App() {
   const [deck, setDeck] = useState([]);
@@ -45,9 +46,7 @@ function App() {
             {/* parameter 'card': the current element in the deck array */}
             {/* key={card.id}: idenifier for each element */}
             {deck.map((card) => (
-              <div key={card.id}>
-                {card.rank} of {card.suit} {card.emoji}
-              </div>
+              <Card key={card.id} emoji={card.emoji}></Card>
             ))}
           </div>
           <div className="columns-section">
@@ -57,9 +56,7 @@ function App() {
             {columns.map((column, columnIndex) => (
               <div key={columnIndex} className="column">
                 {column.map((card) => (
-                  <div key={card.id}>
-                    {card.rank} of {card.suit} {card.emoji}
-                  </div>
+                  <Card key={card.id} emoji={card.emoji}></Card>
                 ))}
               </div>
             ))}
