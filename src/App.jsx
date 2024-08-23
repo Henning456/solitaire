@@ -7,6 +7,7 @@ function App() {
   const [deck, setDeck] = useState([]);
   const [columns, setColumns] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
+  const [revealedDeck, setRevealedDeck] = useState([]);
 
   // to the new variable newDeck gets assigned the shuffled deck from 'getShuffledDeck' --> easier to read, inspect, debug
   const handlePlayButton = () => {
@@ -26,10 +27,17 @@ function App() {
       index += i;
     }
 
-    // Remove the cards that were dealt to the columns from 'newDeck'
-    newDeck = newDeck.slice(index);
-    setDeck(newDeck); // Update the deck state with remaining cards
-    setColumns(newColumns); // Set the columns with the dealt cards
+    newDeck = newDeck.slice(index); // Remove the cards that were dealt to the columns from 'newDeck'
+    setDeck(newDeck); // Update the 'deck' state with remaining cards
+    setColumns(newColumns); // Update the 'columns' state with the dealt cards
+  };
+
+  const handleRevealCard = () => {
+    if (deck.length > 0) {
+      const [firstCard, ...restOfDeck] = deck;
+      setRevealedDeck([...revealedDeck, firstCard]); // Add the revealed card to the revealedDeck array
+      setDeck(restOfDeck); // Update the deck to remove the revealed card
+    }
   };
 
   return (
@@ -41,16 +49,18 @@ function App() {
       ) : (
         <div className="game-area">
           <div className="deck-section">
-            <h2>Shuffled Deck</h2>
-            {/* 'map' iterates over each card in the deck array and transforms in into JSX elements for rendering */}
-            {/* parameter 'card': the current element in the deck array */}
-            {/* key={card.id}: idenifier for each element */}
-            {deck.map((card) => (
-              <Card key={card.id} emoji={card.emoji}></Card>
+            <h2>Deck</h2>
+            <div className="card-back" onClick={handleRevealCard}></div>
+          </div>
+
+          <div className="revealed-section">
+            {revealedDeck.map((card, index) => (
+              <Card key={index} emoji={card.emoji}></Card>
             ))}
           </div>
+
           <div className="columns-section">
-            {/* column: the current column | columnIndex: individual column index  */}
+            {/* column: the current column | columnIndex: current individual column index  */}
             {/* for each column, a div element is created */}
             {/* column.map((card): iterate over the individual cards in the column */}
             {columns.map((column, columnIndex) => (

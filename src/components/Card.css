@@ -12,3 +12,22 @@
   margin: 10px;
   text-align: center;
 }
+
+.card-back {
+  width: 100px;
+  height: 150px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  background-color: #9d0900; /* Dark blue background for the card back */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  /* display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 24px; */
+  cursor: pointer;
+}
+
+.revealed-card {
+  margin-top: 10px; /* Space between the card back and the revealed card */
+}
