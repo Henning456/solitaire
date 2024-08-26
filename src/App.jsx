@@ -1,4 +1,5 @@
 import "./App.css";
+import "./components/Card.css";
 import { useState } from "react";
 import { getShuffledDeck } from "./utils/deck";
 import Card from "./components/Card";
@@ -51,16 +52,12 @@ function App() {
           <div className="deck-section">
             <h2>Deck</h2>
             <div className="card-back" onClick={handleRevealCard}></div>
-          </div>
 
-          <div className="revealed-deck">
-            {revealedDeck.map((card, index) => (
-              <Card
-                key={card.id}
-                emoji={card.emoji}
-                stackIndex={index} // pass stack index to control stacking
-              ></Card>
-            ))}
+            <div className="revealed-deck">
+              {revealedDeck.map((card, index) => (
+                <Card key={card.id} emoji={card.emoji} isFaceUp={true}></Card>
+              ))}
+            </div>
           </div>
 
           <div className="columns-section">
@@ -69,8 +66,13 @@ function App() {
             {/* column.map((card): iterate over the individual cards in the column */}
             {columns.map((column, columnIndex) => (
               <div key={columnIndex} className="column">
-                {column.map((card) => (
-                  <Card key={card.id} emoji={card.emoji}></Card>
+                {column.map((card, cardIndex) => (
+                  <Card
+                    key={card.id}
+                    emoji={card.emoji}
+                    stackIndex={cardIndex}
+                    isFaceUp={cardIndex === column.length - 1}
+                  ></Card>
                 ))}
               </div>
             ))}
