@@ -34,8 +34,8 @@ function App() {
 
   const handleRevealCard = () => {
     if (deck.length > 0) {
-      const [firstCard, ...restOfDeck] = deck;
-      setRevealedDeck([...revealedDeck, firstCard]); // Add the revealed card to the revealedDeck array
+      const [firstCard, ...restOfDeck] = deck; // array destructuring: 'deck' gets divided in the first element and the rest
+      setRevealedDeck([...revealedDeck, firstCard]); // Add the revealed card to the revealedDeck array (using a temporary copy in this operation)
       setDeck(restOfDeck); // Update the deck to remove the revealed card
     }
   };
@@ -53,9 +53,13 @@ function App() {
             <div className="card-back" onClick={handleRevealCard}></div>
           </div>
 
-          <div className="revealed-section">
+          <div className="revealed-deck">
             {revealedDeck.map((card, index) => (
-              <Card key={index} emoji={card.emoji}></Card>
+              <Card
+                key={card.id}
+                emoji={card.emoji}
+                stackIndex={index} // pass stack index to control stacking
+              ></Card>
             ))}
           </div>
 

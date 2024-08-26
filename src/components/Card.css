@@ -18,7 +18,7 @@
   height: 150px;
   border: 2px solid #333;
   border-radius: 10px;
-  background-color: #9d0900; /* Dark blue background for the card back */
+  background-color: #9d0900;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   /* display: flex;
   justify-content: center;
@@ -28,6 +28,20 @@
   cursor: pointer;
 }
 
-.revealed-card {
-  margin-top: 10px; /* Space between the card back and the revealed card */
+.revealed-deck {
+  position: relative;
+  width: 100px;
+  height: 150px;
+}
+
+.revealed-deck .card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(28px); /* change the overlap */
+  transition: transform 0.3s ease; /* Optional: smooth transition for stacking */
+}
+
+.revealed-deck .card:not(:first-child) {
+  transform: translateY(calc(28px * var(--stack-index))); /* Stack the cards */
 }
