@@ -1,4 +1,5 @@
 import "./App.css";
+import "./components/Card.css";
 import { useState } from "react";
 import { getShuffledDeck } from "./utils/deck";
 import Card from "./components/Card";
@@ -7,6 +8,7 @@ function App() {
   const [deck, setDeck] = useState([]);
   const [columns, setColumns] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
+  const [revealedDeck, setRevealedDeck] = useState([]);
 
   // to the new variable newDeck gets assigned the shuffled deck from 'getShuffledDeck' --> easier to read, inspect, debug
   const handlePlayButton = () => {
@@ -26,10 +28,17 @@ function App() {
       index += i;
     }
 
-    // Remove the cards that were dealt to the columns from 'newDeck'
-    newDeck = newDeck.slice(index);
-    setDeck(newDeck); // Update the deck state with remaining cards
-    setColumns(newColumns); // Set the columns with the dealt cards
+    newDeck = newDeck.slice(index); // Remove the cards that were dealt to the columns from 'newDeck'
+    setDeck(newDeck); // Update the 'deck' state with remaining cards
+    setColumns(newColumns); // Update the 'columns' state with the dealt cards
+  };
+
+  const handleRevealCard = () => {
+    if (deck.length > 0) {
+      const [firstCard, ...restOfDeck] = deck; // array destructuring: 'deck' gets divided in the first element and the rest
+      setRevealedDeck([...revealedDeck, firstCard]); // Add the revealed card to the revealedDeck array (using a temporary copy in this operation)
+      setDeck(restOfDeck); // Update the deck to remove the revealed card
+    }
   };
 
   return (
@@ -41,22 +50,29 @@ function App() {
       ) : (
         <div className="game-area">
           <div className="deck-section">
-            <h2>Shuffled Deck</h2>
-            {/* 'map' iterates over each card in the deck array and transforms in into JSX elements for rendering */}
-            {/* parameter 'card': the current element in the deck array */}
-            {/* key={card.id}: idenifier for each element */}
-            {deck.map((card) => (
-              <Card key={card.id} emoji={card.emoji}></Card>
-            ))}
+            <h2>Deck</h2>
+            <div className="card-back" onClick={handleRevealCard}></div>
+
+            <div className="revealed-deck">
+              {revealedDeck.map((card, index) => (
+                <Card key={card.id} emoji={card.emoji} isFaceUp={true}></Card>
+              ))}
+            </div>
           </div>
+
           <div className="columns-section">
-            {/* column: the current column | columnIndex: individual column index  */}
+            {/* column: the current column | columnIndex: current individual column index  */}
             {/* for each column, a div element is created */}
             {/* column.map((card): iterate over the individual cards in the column */}
             {columns.map((column, columnIndex) => (
               <div key={columnIndex} className="column">
-                {column.map((card) => (
-                  <Card key={card.id} emoji={card.emoji}></Card>
+                {column.map((card, cardIndex) => (
+                  <Card
+                    key={card.id}
+                    emoji={card.emoji}
+                    stackIndex={cardIndex}
+                    isFaceUp={cardIndex === column.length - 1}
+                  ></Card>
                 ))}
               </div>
             ))}
