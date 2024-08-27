@@ -1,9 +1,9 @@
+:root {
+  background-color: #0a741f;
+}
+
 .App {
   text-align: center;
-  /* background-color: rgb(187, 106, 8); */
-  background-color: #0a741f;
-  /* font-family: Arial, sans-serif; */
-  margin-top: 20px;
 }
 
 button {
@@ -21,20 +21,21 @@ button {
 
 .deck-section {
   text-align: left;
-  /* margin: 10px; */
+  width: 100%;
 }
 
 .columns-section {
   display: flex;
   flex-direction: row;
-  gap: 100px;
+  gap: 50px;
   padding: 20px;
+  width: 100%;
 }
 
 .column {
   display: flex;
   flex-direction: column;
-  position: relative; /* Important for stacking */
+  position: relative;
   width: 100px;
 }
 
@@ -45,8 +46,8 @@ button {
 }
 
 .column .card-back {
-  top: calc(30px * var(--stack-index)); /* Adjust this for overlap spacing */
-  z-index: var(--stack-index);
+  /* top: calc(30px * var(--stack-index));
+  z-index: var(--stack-index); */
 }
 
 .revealed-deck {
@@ -61,11 +62,3 @@ button {
   top: 0;
   left: 0;
 }
-
-/* transform: translateY(28px); change the overlap
-  transition: transform 0.3s ease; Optional: smooth transition for stacking
-
-
-.revealed-deck .card:not(:first-child) {
-  transform: translateY(calc(28px * var(--stack-index))); Stack the cards
- */
