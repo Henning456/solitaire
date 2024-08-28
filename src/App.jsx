@@ -29,43 +29,61 @@ function App() {
       index += i;
     }
 
+    const stacks = newColumns.map((stack) =>
+      stack.map((card, index, array) =>
+        index === array.length - 1 ? { ...card, isFaceUp: true } : card
+      )
+    );
+    console.log(stacks);
+
     newDeck = newDeck.slice(index); // Remove the cards that were dealt to the columns from 'newDeck'
     setDeck(newDeck); // Update the 'deck' state with remaining cards
-    setColumns(newColumns); // Update the 'columns' state with the dealt cards
+    setColumns(stacks); // Update the 'columns' state with the dealt cards
   };
 
   const handleRevealCard = () => {
     if (deck.length > 0) {
-      const [firstCard, ...restOfDeck] = deck; // array destructuring: 'deck' gets divided in the first element and the rest
-      setRevealedDeck([...revealedDeck, firstCard]); // Add the revealed card to the revealedDeck array (using a temporary copy in this operation)
-      setDeck(restOfDeck); // Update the deck to remove the revealed card
+      const [firstCard, ...restOfDeck] = deck;
+
+      console.log(firstCard);
+      const revealedCard = { ...firstCard, isFaceUp: true }; // set isFaceUp on true
+      console.log(revealedCard);
+      setRevealedDeck([...revealedDeck, revealedCard]); // add the revealed card to the revealedDeck
+
+      setDeck(restOfDeck); // Aktualisiere den Deck, um die aufgedeckte Karte zu entfernen
     }
   };
+
   //
   // Select and move Cards
   //
   const handleCardSelect = (card, fromColumnIndex = null) => {
     setSelectedCard({ card, fromColumnIndex });
+    console.log(selectedCard);
   };
-
+  console.log(selectedCard);
   const handleCardDrop = (toColumnIndex) => {
     if (!selectedCard) return;
 
     const { card, fromColumnIndex } = selectedCard;
 
     if (fromColumnIndex !== null) {
-      const updatedColumns = [...columns];
-      updatedColumns[fromColumnIndex] = updatedColumns[fromColumnIndex].filter(
-        (c) => c.id !== card.id
-      );
-      setColumns(updatedColumns);
+      setColumns((prevColumns) => {
+        const updatedColumns = [...prevColumns];
+        updatedColumns[fromColumnIndex] = updatedColumns[
+          fromColumnIndex
+        ].filter((c) => c.id !== card.id);
+        return updatedColumns;
+      });
     } else {
       setRevealedDeck(revealedDeck.filter((c) => c.id !== card.id));
     }
 
-    const updatedColumns = [...columns];
-    updatedColumns[toColumnIndex] = [...updatedColumns[toColumnIndex], card];
-    setColumns(updatedColumns);
+    setColumns((prevColumns) => {
+      const updatedColumns = [...prevColumns];
+      updatedColumns[toColumnIndex] = [...updatedColumns[toColumnIndex], card];
+      return updatedColumns;
+    });
 
     setSelectedCard(null);
   };
@@ -110,7 +128,7 @@ function App() {
                     key={card.id}
                     emoji={card.emoji}
                     stackIndex={cardIndex}
-                    isFaceUp={cardIndex === column.length - 1}
+                    isFaceUp={card.isFaceUp}
                     onClick={() =>
                       cardIndex === column.length - 1
                         ? handleCardSelect(card, columnIndex)
