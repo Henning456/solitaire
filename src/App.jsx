@@ -9,6 +9,7 @@ function App() {
   const [columns, setColumns] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [revealedDeck, setRevealedDeck] = useState([]);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   // to the new variable newDeck gets assigned the shuffled deck from 'getShuffledDeck' --> easier to read, inspect, debug
   const handlePlayButton = () => {
@@ -40,6 +41,34 @@ function App() {
       setDeck(restOfDeck); // Update the deck to remove the revealed card
     }
   };
+  //
+  // Select and move Cards
+  //
+  const handleCardSelect = (card, fromColumnIndex = null) => {
+    setSelectedCard({ card, fromColumnIndex });
+  };
+
+  const handleCardDrop = (toColumnIndex) => {
+    if (!selectedCard) return;
+
+    const { card, fromColumnIndex } = selectedCard;
+
+    if (fromColumnIndex !== null) {
+      const updatedColumns = [...columns];
+      updatedColumns[fromColumnIndex] = updatedColumns[fromColumnIndex].filter(
+        (c) => c.id !== card.id
+      );
+      setColumns(updatedColumns);
+    } else {
+      setRevealedDeck(revealedDeck.filter((c) => c.id !== card.id));
+    }
+
+    const updatedColumns = [...columns];
+    updatedColumns[toColumnIndex] = [...updatedColumns[toColumnIndex], card];
+    setColumns(updatedColumns);
+
+    setSelectedCard(null);
+  };
 
   return (
     <div className="App">
@@ -54,8 +83,14 @@ function App() {
             <div className="card-back" onClick={handleRevealCard}></div>
 
             <div className="revealed-deck">
-              {revealedDeck.map((card, index) => (
-                <Card key={card.id} emoji={card.emoji} isFaceUp={true}></Card>
+              {revealedDeck.map((card) => (
+                <Card
+                  key={card.id}
+                  emoji={card.emoji}
+                  isFaceUp={true}
+                  isSelected={selectedCard?.card?.id === card.id}
+                  onClick={() => handleCardSelect(card)}
+                ></Card>
               ))}
             </div>
           </div>
@@ -65,13 +100,23 @@ function App() {
             {/* for each column, a div element is created */}
             {/* column.map((card): iterate over the individual cards in the column */}
             {columns.map((column, columnIndex) => (
-              <div key={columnIndex} className="column">
+              <div
+                key={columnIndex}
+                className="column"
+                onClick={() => handleCardDrop(columnIndex)}
+              >
                 {column.map((card, cardIndex) => (
                   <Card
                     key={card.id}
                     emoji={card.emoji}
                     stackIndex={cardIndex}
                     isFaceUp={cardIndex === column.length - 1}
+                    onClick={() =>
+                      cardIndex === column.length - 1
+                        ? handleCardSelect(card, columnIndex)
+                        : null
+                    }
+                    isSelected={selectedCard?.card?.id === card.id}
                   ></Card>
                 ))}
               </div>
