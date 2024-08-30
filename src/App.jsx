@@ -9,6 +9,7 @@ function App() {
   const [columns, setColumns] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [revealedDeck, setRevealedDeck] = useState([]);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   // to the new variable newDeck gets assigned the shuffled deck from 'getShuffledDeck' --> easier to read, inspect, debug
   const handlePlayButton = () => {
@@ -28,17 +29,70 @@ function App() {
       index += i;
     }
 
+    const stacks = newColumns.map((stack) =>
+      stack.map((card, index, array) =>
+        index === array.length - 1 ? { ...card, isFaceUp: true } : card
+      )
+    );
+    console.log(stacks);
+
     newDeck = newDeck.slice(index); // Remove the cards that were dealt to the columns from 'newDeck'
     setDeck(newDeck); // Update the 'deck' state with remaining cards
-    setColumns(newColumns); // Update the 'columns' state with the dealt cards
+    setColumns(stacks); // Update the 'columns' state with the dealt cards
   };
 
   const handleRevealCard = () => {
     if (deck.length > 0) {
-      const [firstCard, ...restOfDeck] = deck; // array destructuring: 'deck' gets divided in the first element and the rest
-      setRevealedDeck([...revealedDeck, firstCard]); // Add the revealed card to the revealedDeck array (using a temporary copy in this operation)
-      setDeck(restOfDeck); // Update the deck to remove the revealed card
+      const [firstCard, ...restOfDeck] = deck;
+
+      console.log(firstCard);
+      const revealedCard = { ...firstCard, isFaceUp: true }; // set isFaceUp on true
+      console.log(revealedCard);
+      setRevealedDeck([...revealedDeck, revealedCard]); // add the revealed card to the revealedDeck
+
+      setDeck(restOfDeck); // update deck
     }
+  };
+
+  //
+  // Select and move Cards
+  //
+  // if null: card not from column but revealedDeck
+  const handleCardSelect = (card, fromColumnIndex = null) => {
+    // selected card and origin are saved in state
+    setSelectedCard({ card, fromColumnIndex });
+  };
+
+  const handleCardDrop = (toColumnIndex) => {
+    if (!selectedCard) return;
+
+    // card and fromColumnIndex are destructured from selectedCard
+    const { card, fromColumnIndex } = selectedCard;
+
+    // check if card is from a column (not null)
+    if (fromColumnIndex !== null) {
+      setColumns((prevColumns) => {
+        const updatedColumns = [...prevColumns]; // copy of prevColumns, original prevColumns is not changed
+        updatedColumns[fromColumnIndex] = // gets the specific column in the updatedColumns array
+          // check if id of current card (c.id) is not the same id of the card that will be deleted
+          // result: new array that contains all cards aside the card that is to be deleted
+          updatedColumns[fromColumnIndex].filter((c) => c.id !== card.id);
+        return updatedColumns;
+      });
+    } else {
+      // if card is from revealedDeck (fromColumnIndex === null): card will be deleted from revealedDeck
+      setRevealedDeck(revealedDeck.filter((c) => c.id !== card.id));
+    }
+
+    // add card to another column: update 'columns' state; add selected card to new column
+    setColumns((prevColumns) => {
+      const updatedColumns = [...prevColumns];
+      // new array is created, containing all cards in target column plus new card (new array created by spred operator) --> then new array is assigned to 'updatedColumns[toColumnIndex]'
+      updatedColumns[toColumnIndex] = [...updatedColumns[toColumnIndex], card];
+      return updatedColumns;
+    });
+
+    setSelectedCard(null);
   };
 
   return (
@@ -54,8 +108,14 @@ function App() {
             <div className="card-back" onClick={handleRevealCard}></div>
 
             <div className="revealed-deck">
-              {revealedDeck.map((card, index) => (
-                <Card key={card.id} emoji={card.emoji} isFaceUp={true}></Card>
+              {revealedDeck.map((card) => (
+                <Card
+                  key={card.id}
+                  emoji={card.emoji}
+                  isFaceUp={true}
+                  isSelected={selectedCard?.card?.id === card.id}
+                  onClick={() => handleCardSelect(card)}
+                ></Card>
               ))}
             </div>
           </div>
@@ -65,13 +125,23 @@ function App() {
             {/* for each column, a div element is created */}
             {/* column.map((card): iterate over the individual cards in the column */}
             {columns.map((column, columnIndex) => (
-              <div key={columnIndex} className="column">
+              <div
+                key={columnIndex}
+                className="column"
+                onClick={() => handleCardDrop(columnIndex)}
+              >
                 {column.map((card, cardIndex) => (
                   <Card
                     key={card.id}
                     emoji={card.emoji}
                     stackIndex={cardIndex}
-                    isFaceUp={cardIndex === column.length - 1}
+                    isFaceUp={card.isFaceUp}
+                    onClick={() =>
+                      cardIndex === column.length - 1
+                        ? handleCardSelect(card, columnIndex)
+                        : null
+                    }
+                    isSelected={selectedCard?.card?.id === card.id}
                   ></Card>
                 ))}
               </div>

@@ -29,3 +29,7 @@
 .card:hover {
   transform: scale(1.05);
 }
+
+.card.selected {
+  border: 2px solid yellow;
+}
