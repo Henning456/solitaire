@@ -50,37 +50,44 @@ function App() {
       console.log(revealedCard);
       setRevealedDeck([...revealedDeck, revealedCard]); // add the revealed card to the revealedDeck
 
-      setDeck(restOfDeck); // Aktualisiere den Deck, um die aufgedeckte Karte zu entfernen
+      setDeck(restOfDeck); // update deck
     }
   };
 
   //
   // Select and move Cards
   //
+  // if null: card not from column but revealedDeck
   const handleCardSelect = (card, fromColumnIndex = null) => {
+    // selected card and origin are saved in state
     setSelectedCard({ card, fromColumnIndex });
-    console.log(selectedCard);
   };
-  console.log(selectedCard);
+
   const handleCardDrop = (toColumnIndex) => {
     if (!selectedCard) return;
 
+    // card and fromColumnIndex are destructured from selectedCard
     const { card, fromColumnIndex } = selectedCard;
 
+    // check if card is from a column (not null)
     if (fromColumnIndex !== null) {
       setColumns((prevColumns) => {
-        const updatedColumns = [...prevColumns];
-        updatedColumns[fromColumnIndex] = updatedColumns[
-          fromColumnIndex
-        ].filter((c) => c.id !== card.id);
+        const updatedColumns = [...prevColumns]; // copy of prevColumns, original prevColumns is not changed
+        updatedColumns[fromColumnIndex] = // gets the specific column in the updatedColumns array
+          // check if id of current card (c.id) is not the same id of the card that will be deleted
+          // result: new array that contains all cards aside the card that is to be deleted
+          updatedColumns[fromColumnIndex].filter((c) => c.id !== card.id);
         return updatedColumns;
       });
     } else {
+      // if card is from revealedDeck (fromColumnIndex === null): card will be deleted from revealedDeck
       setRevealedDeck(revealedDeck.filter((c) => c.id !== card.id));
     }
 
+    // add card to another column: update 'columns' state; add selected card to new column
     setColumns((prevColumns) => {
       const updatedColumns = [...prevColumns];
+      // new array is created, containing all cards in target column plus new card (new array created by spred operator) --> then new array is assigned to 'updatedColumns[toColumnIndex]'
       updatedColumns[toColumnIndex] = [...updatedColumns[toColumnIndex], card];
       return updatedColumns;
     });
