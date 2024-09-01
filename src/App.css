@@ -21,7 +21,7 @@ button {
 
 .foundation-section {
   display: flex;
-  flex: 1 1 100%;
+  /* flex: 1 1 100%; */
   justify-content: space-between;
   padding: 20px;
   width: 100%;
@@ -41,14 +41,15 @@ button {
   margin: 10px;
 }
 
-.deck-section,
+/* .deck-section,
 .columns-section {
   flex: 1 1 50%;
-}
+} */
 
 .deck-section {
   text-align: left;
   width: 100%;
+  flex-direction: column;
 }
 
 .columns-section {

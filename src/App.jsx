@@ -10,6 +10,12 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [revealedDeck, setRevealedDeck] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [foundations, setFoundations] = useState({
+    hearts: [],
+    diamonds: [],
+    clubs: [],
+    spades: [],
+  });
 
   // to the new variable newDeck gets assigned the shuffled deck from 'getShuffledDeck' --> easier to read, inspect, debug
   const handlePlayButton = () => {
@@ -57,20 +63,25 @@ function App() {
   //
   // Select and move Cards
   //
-  // if null: card not from column but revealedDeck
-  const handleCardSelect = (card, fromColumnIndex = null) => {
-    // selected card and origin are saved in state
-    setSelectedCard({ card, fromColumnIndex });
+  // if null: card not from column but revealedDeck or foundation
+  const handleCardSelect = (
+    card,
+    fromColumnIndex = null,
+    fromFoundation = null
+  ) => {
+    // selected card, origin, and foundation are saved in state
+    setSelectedCard({ card, fromColumnIndex, fromFoundation });
   };
 
-  const handleCardDrop = (toColumnIndex) => {
+  const handleCardDrop = (toColumnIndex = null, toFoundation = null) => {
     if (!selectedCard) return;
 
-    // card and fromColumnIndex are destructured from selectedCard
-    const { card, fromColumnIndex } = selectedCard;
+    // card, fromColumnIndex, and fromFoundation are destructured from selectedCard
+    const { card, fromColumnIndex, fromFoundation } = selectedCard;
 
     // check if card is from a column (not null)
     if (fromColumnIndex !== null) {
+      // Handle card moving from a column
       setColumns((prevColumns) => {
         const updatedColumns = [...prevColumns]; // copy of prevColumns, original prevColumns is not changed
         updatedColumns[fromColumnIndex] = // gets the specific column in the updatedColumns array
@@ -79,18 +90,44 @@ function App() {
           updatedColumns[fromColumnIndex].filter((c) => c.id !== card.id);
         return updatedColumns;
       });
+    } else if (fromFoundation !== null) {
+      // Handle card moving from a foundation
+      setFoundations((prevFoundations) => {
+        const updatedFoundations = { ...prevFoundations };
+        updatedFoundations[fromFoundation] = updatedFoundations[
+          fromFoundation
+        ].filter((c) => c.id !== card.id);
+        return updatedFoundations;
+      });
     } else {
+      // Handle card moving from revealedDeck
       // if card is from revealedDeck (fromColumnIndex === null): card will be deleted from revealedDeck
       setRevealedDeck(revealedDeck.filter((c) => c.id !== card.id));
     }
 
-    // add card to another column: update 'columns' state; add selected card to new column
-    setColumns((prevColumns) => {
-      const updatedColumns = [...prevColumns];
-      // new array is created, containing all cards in target column plus new card (new array created by spred operator) --> then new array is assigned to 'updatedColumns[toColumnIndex]'
-      updatedColumns[toColumnIndex] = [...updatedColumns[toColumnIndex], card];
-      return updatedColumns;
-    });
+    if (toColumnIndex !== null) {
+      // Add card to another column
+      // update 'columns' state; add selected card to new column
+      setColumns((prevColumns) => {
+        const updatedColumns = [...prevColumns];
+        // new array is created, containing all cards in target column plus new card (new array created by spred operator) --> then new array is assigned to 'updatedColumns[toColumnIndex]'
+        updatedColumns[toColumnIndex] = [
+          ...updatedColumns[toColumnIndex],
+          card,
+        ];
+        return updatedColumns;
+      });
+    } else if (toFoundation !== null) {
+      // Add card to a foundation
+      setFoundations((prevFoundations) => {
+        const updatedFoundations = { ...prevFoundations };
+        updatedFoundations[toFoundation] = [
+          ...updatedFoundations[toFoundation],
+          card,
+        ];
+        return updatedFoundations;
+      });
+    }
 
     setSelectedCard(null);
   };
@@ -104,10 +141,32 @@ function App() {
       ) : (
         <div className="game-area">
           <div className="foundation-section">
-            <div className="foundation-stack hearts"></div>
-            <div className="foundation-stack diamonds"></div>
-            <div className="foundation-stack clubs"></div>
-            <div className="foundation-stack spades"></div>
+            {Object.keys(foundations).map((suit) => (
+              <div
+                key={suit}
+                className={`foundation-stack ${suit}`}
+                onClick={() => handleCardDrop(null, suit)}
+              >
+                <div className="placeholder"></div>
+                {foundations[suit].length > 0 && (
+                  <div
+                    onClick={() =>
+                      handleCardSelect(
+                        foundations[suit][foundations[suit].length - 1],
+                        null,
+                        suit
+                      )
+                    }
+                  >
+                    <div className="card">
+                      {`${
+                        foundations[suit][foundations[suit].length - 1].value
+                      } of ${suit}`}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
           <div className="deck-section">
             <h2>Deck</h2>
