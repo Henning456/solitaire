@@ -34,7 +34,7 @@ function App() {
         index === array.length - 1 ? { ...card, isFaceUp: true } : card
       )
     );
-    console.log(stacks);
+    // console.log(stacks);
 
     newDeck = newDeck.slice(index); // Remove the cards that were dealt to the columns from 'newDeck'
     setDeck(newDeck); // Update the 'deck' state with remaining cards
@@ -45,7 +45,7 @@ function App() {
     if (deck.length > 0) {
       const [firstCard, ...restOfDeck] = deck;
 
-      console.log(firstCard);
+      // console.log(firstCard);
       const revealedCard = { ...firstCard, isFaceUp: true }; // set isFaceUp on true
       console.log(revealedCard);
       setRevealedDeck([...revealedDeck, revealedCard]); // add the revealed card to the revealedDeck
@@ -103,11 +103,18 @@ function App() {
         <button onClick={handlePlayButton}>Play</button>
       ) : (
         <div className="game-area">
+          <div className="foundation-section">
+            <div className="foundation-stack hearts"></div>
+            <div className="foundation-stack diamonds"></div>
+            <div className="foundation-stack clubs"></div>
+            <div className="foundation-stack spades"></div>
+          </div>
           <div className="deck-section">
             <h2>Deck</h2>
             <div className="card-back" onClick={handleRevealCard}></div>
-
+            <div className="placeholder"></div>
             <div className="revealed-deck">
+              <div className="placeholder"></div>
               {revealedDeck.map((card) => (
                 <Card
                   key={card.id}
@@ -130,6 +137,7 @@ function App() {
                 className="column"
                 onClick={() => handleCardDrop(columnIndex)}
               >
+                <div className="placeholder"></div>
                 {column.map((card, cardIndex) => (
                   <Card
                     key={card.id}
