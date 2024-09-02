@@ -94,6 +94,16 @@ function App() {
           // result: new array that contains all cards aside the card that is to be deleted
           updatedColumns[fromColumnIndex].filter((c) => c.id !== card.id);
 
+        // Uncover the new top card if it's face down
+        if (updatedColumns[fromColumnIndex].length > 0) {
+          const topCard =
+            updatedColumns[fromColumnIndex][
+              updatedColumns[fromColumnIndex].length - 1
+            ];
+          if (!topCard.isFaceUp) {
+            topCard.isFaceUp = true;
+          }
+        }
         return updatedColumns;
       });
     } else if (fromFoundation !== null) {
