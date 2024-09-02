@@ -1,7 +1,7 @@
 :root {
   background-color: #0a741f;
   text-align: center;
-  color: black;
+  color: #f0f0f0;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
@@ -13,9 +13,12 @@ button {
 }
 
 .game-area {
+  color: black;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  margin: 50px;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px;
 }
 
@@ -24,21 +27,26 @@ button {
   /* flex: 1 1 100%; */
   justify-content: space-between;
   padding: 20px;
-  width: 100%;
+  width: 60%;
   margin-bottom: 50px;
 }
 
 .foundation-stack {
   width: 100px;
   height: 150px;
-  border: 2px dashed rgba(0, 0, 0, 0.2);
+  border: 2px rgba(0, 0, 0, 0.2);
   border-radius: 10px;
-  background-color: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   margin: 10px;
+}
+
+.foundation-stack .card {
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
 }
 
 /* .deck-section,
@@ -48,8 +56,8 @@ button {
 
 .deck-section {
   text-align: left;
-  width: 100%;
-  flex-direction: column;
+  width: 30%;
+  display: flex;
 }
 
 .columns-section {
@@ -57,7 +65,7 @@ button {
   flex-direction: row;
   gap: 50px;
   padding: 20px;
-  width: 100%;
+  width: 80%;
 }
 
 .column {
@@ -104,10 +112,10 @@ button {
   width: 100px;
   height: 150px;
   border: 2px dashed rgba(0, 0, 0, 0.2);
+  background-color: lightgreen;
   border-radius: 10px;
   top: 0;
   left: 0;
-  background-color: transparent;
 }
 
 .column .placeholder {

@@ -79,6 +79,11 @@ function App() {
     // card, fromColumnIndex, and fromFoundation are destructured from selectedCard
     const { card, fromColumnIndex, fromFoundation } = selectedCard;
 
+    // Set the card to face up if it's being moved to a foundation
+    if (toFoundation !== null) {
+      card.isFaceUp = true;
+    }
+
     // check if card is from a column (not null)
     if (fromColumnIndex !== null) {
       // Handle card moving from a column
@@ -88,6 +93,7 @@ function App() {
           // check if id of current card (c.id) is not the same id of the card that will be deleted
           // result: new array that contains all cards aside the card that is to be deleted
           updatedColumns[fromColumnIndex].filter((c) => c.id !== card.id);
+
         return updatedColumns;
       });
     } else if (fromFoundation !== null) {
@@ -152,6 +158,10 @@ function App() {
                   <Card
                     key={foundations[suit][foundations[suit].length - 1].id}
                     card={foundations[suit][foundations[suit].length - 1]}
+                    isFaceUp={true}
+                    emoji={
+                      foundations[suit][foundations[suit].length - 1].emoji
+                    }
                     onClick={() =>
                       handleCardSelect(
                         foundations[suit][foundations[suit].length - 1],
@@ -165,7 +175,7 @@ function App() {
             ))}
           </div>
           <div className="deck-section">
-            <h2>Deck</h2>
+            {/* <h2>Deck</h2> */}
             <div className="card-back" onClick={handleRevealCard}></div>
             <div className="placeholder"></div>
             <div className="revealed-deck">

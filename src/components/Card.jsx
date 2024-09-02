@@ -3,7 +3,7 @@ import "./Card.css";
 export const Card = ({ emoji, stackIndex, isFaceUp, onClick, isSelected }) => {
   return (
     <div
-      className={`card ${isFaceUp ? "" : "card-back"} ${
+      className={`card ${isFaceUp ? "card" : "card-back"} ${
         isSelected ? "selected" : ""
       }`}
       onClick={onClick}
