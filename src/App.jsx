@@ -149,7 +149,9 @@ function App() {
               >
                 <div className="placeholder"></div>
                 {foundations[suit].length > 0 && (
-                  <div
+                  <Card
+                    key={foundations[suit][foundations[suit].length - 1].id}
+                    card={foundations[suit][foundations[suit].length - 1]}
                     onClick={() =>
                       handleCardSelect(
                         foundations[suit][foundations[suit].length - 1],
@@ -157,13 +159,7 @@ function App() {
                         suit
                       )
                     }
-                  >
-                    <div className="card">
-                      {`${
-                        foundations[suit][foundations[suit].length - 1].value
-                      } of ${suit}`}
-                    </div>
-                  </div>
+                  ></Card>
                 )}
               </div>
             ))}
