@@ -35,6 +35,7 @@ function App() {
       index += i;
     }
 
+    // top card of each column is set to isFaceUp: true
     const stacks = newColumns.map((stack) =>
       stack.map((card, index, array) =>
         index === array.length - 1 ? { ...card, isFaceUp: true } : card
@@ -94,11 +95,13 @@ function App() {
           // result: new array that contains all cards aside the card that is to be deleted
           updatedColumns[fromColumnIndex].filter((c) => c.id !== card.id);
 
+        // CARD FLIP CHECK 1: immediate change of data without rendering the UI
         // Uncover the new top card if it's face down
         if (updatedColumns[fromColumnIndex].length > 0) {
+          // check if cards are in the column
           const topCard =
-            updatedColumns[fromColumnIndex][
-              updatedColumns[fromColumnIndex].length - 1
+            updatedColumns[fromColumnIndex][ // column in which the top card was deleted
+              updatedColumns[fromColumnIndex].length - 1 // determines the index of the top card of this column (=last card in this array)
             ];
           if (!topCard.isFaceUp) {
             topCard.isFaceUp = true;
@@ -142,6 +145,24 @@ function App() {
           card,
         ];
         return updatedFoundations;
+      });
+    }
+
+    // CARD FLIP CHECK 2: change of useState via setColumns -> rendering of the UI
+    // Check if the new top card in the "fromColumnIndex" column needs to be flipped
+    if (fromColumnIndex !== null) {
+      setColumns((prevColumns) => {
+        const updatedColumns = [...prevColumns];
+        if (updatedColumns[fromColumnIndex].length > 0) {
+          const topCard =
+            updatedColumns[fromColumnIndex][
+              updatedColumns[fromColumnIndex].length - 1
+            ];
+          if (!topCard.isFaceUp) {
+            topCard.isFaceUp = true;
+          }
+        }
+        return updatedColumns;
       });
     }
 
