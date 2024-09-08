@@ -80,11 +80,6 @@ function App() {
     // card, fromColumnIndex, and fromFoundation are destructured from selectedCard
     const { card, fromColumnIndex, fromFoundation } = selectedCard;
 
-    // Set the card to face up if it's being moved to a foundation
-    if (toFoundation !== null) {
-      card.isFaceUp = true;
-    }
-
     // check if card is from a column (not null)
     if (fromColumnIndex !== null) {
       // Handle card moving from a column
