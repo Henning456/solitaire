@@ -53,16 +53,21 @@ function App() {
     setColumns(stacks); // Update the 'columns' state with the dealt cards
   };
 
-  const handleDeckClick = () => {
+  const handleDrawCard = () => {
     if (deck.length > 0) {
       const [firstCard, ...restOfDeck] = deck;
 
-      // console.log(firstCard);
       const revealedCard = { ...firstCard, isFaceUp: true }; // set isFaceUp on true
-      console.log(revealedCard);
       setRevealedDeck([...revealedDeck, revealedCard]); // add the revealed card to the revealedDeck
-
       setDeck(restOfDeck); // update deck
+    }
+  };
+
+  // Reverse cards from revealedCards back to deck (when deck is empty)
+  const handleResetDeck = () => {
+    if (deck.length === 0 && revealedDeck.length > 0) {
+      setDeck(revealedDeck.map((card) => ({ ...card, isFaceUp: false })));
+      setRevealedDeck([]); // empty revealedDeck
     }
   };
 
@@ -250,9 +255,14 @@ function App() {
             ))}
           </div>
           <div className="deck-section">
-            {/* <h2>Deck</h2> */}
-            <div className="card-back" onClick={handleDeckClick}></div>
-            <div className="placeholder"></div>
+            {deck.length > 0 ? (
+              <div className="card-back" onClick={handleDrawCard}></div>
+            ) : (
+              <div className="deck-placeholder" onClick={handleResetDeck}>
+                Click to reverse deck
+              </div>
+            )}
+
             <div className="revealed-deck">
               <div className="placeholder"></div>
               {revealedDeck.map((card) => (
@@ -266,6 +276,10 @@ function App() {
               ))}
             </div>
           </div>
+
+          {/* {deck.length === 0 && revealedDeck.length > 0 && (
+            <button onClick={handleResetDeck}>Reset Deck</button>
+          )} */}
 
           <div className="columns-section">
             {/* column: the current column | columnIndex: current individual column index  */}
