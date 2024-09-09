@@ -2,6 +2,10 @@ import "./App.css";
 import "./components/Card.css";
 import { useState } from "react";
 import { getShuffledDeck } from "./utils/deck";
+import {
+  canMoveCardToColumn,
+  canMoveCardToFoundation,
+} from "./components/moves";
 import Card from "./components/Card";
 
 function App() {
@@ -9,6 +13,7 @@ function App() {
   const [columns, setColumns] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [revealedDeck, setRevealedDeck] = useState([]);
+  // { card, fromColumnIndex, fromFoundation }
   const [selectedCard, setSelectedCard] = useState(null);
   const [foundations, setFoundations] = useState({
     hearts: [],
@@ -48,7 +53,7 @@ function App() {
     setColumns(stacks); // Update the 'columns' state with the dealt cards
   };
 
-  const handleRevealCard = () => {
+  const handleDeckClick = () => {
     if (deck.length > 0) {
       const [firstCard, ...restOfDeck] = deck;
 
@@ -61,7 +66,6 @@ function App() {
     }
   };
 
-  //
   // Select and move Cards
   //
   // if null: card not from column but revealedDeck or foundation
@@ -80,93 +84,133 @@ function App() {
     // card, fromColumnIndex, and fromFoundation are destructured from selectedCard
     const { card, fromColumnIndex, fromFoundation } = selectedCard;
 
-    // Set the card to face up if it's being moved to a foundation
-    if (toFoundation !== null) {
-      card.isFaceUp = true;
-    }
-
-    // check if card is from a column (not null)
-    if (fromColumnIndex !== null) {
-      // Handle card moving from a column
-      setColumns((prevColumns) => {
-        const updatedColumns = [...prevColumns]; // copy of prevColumns, original prevColumns is not changed
-        updatedColumns[fromColumnIndex] = // gets the specific column in the updatedColumns array
-          // check if id of current card (c.id) is not the same id of the card that will be deleted
-          // result: new array that contains all cards aside the card that is to be deleted
-          updatedColumns[fromColumnIndex].filter((c) => c.id !== card.id);
-
-        // CARD FLIP CHECK 1: immediate change of data without rendering the UI
-        // Uncover the new top card if it's face down
-        if (updatedColumns[fromColumnIndex].length > 0) {
-          // check if cards are in the column
-          const topCard =
-            updatedColumns[fromColumnIndex][ // column in which the top card was deleted
-              updatedColumns[fromColumnIndex].length - 1 // determines the index of the top card of this column (=last card in this array)
-            ];
-          if (!topCard.isFaceUp) {
-            topCard.isFaceUp = true;
-          }
-        }
-        return updatedColumns;
-      });
-    } else if (fromFoundation !== null) {
-      // Handle card moving from a foundation
-      setFoundations((prevFoundations) => {
-        const updatedFoundations = { ...prevFoundations };
-        updatedFoundations[fromFoundation] = updatedFoundations[
-          fromFoundation
-        ].filter((c) => c.id !== card.id);
-        return updatedFoundations;
-      });
-    } else {
-      // Handle card moving from revealedDeck
-      // if card is from revealedDeck (fromColumnIndex === null): card will be deleted from revealedDeck
-      setRevealedDeck(revealedDeck.filter((c) => c.id !== card.id));
-    }
-
+    //
+    // Check if card can be moved to column
+    //
     if (toColumnIndex !== null) {
-      // Add card to another column
-      // update 'columns' state; add selected card to new column
-      setColumns((prevColumns) => {
-        const updatedColumns = [...prevColumns];
-        // new array is created, containing all cards in target column plus new card (new array created by spred operator) --> then new array is assigned to 'updatedColumns[toColumnIndex]'
-        updatedColumns[toColumnIndex] = [
-          ...updatedColumns[toColumnIndex],
-          card,
-        ];
-        return updatedColumns;
-      });
-    } else if (toFoundation !== null) {
-      // Add card to a foundation
-      setFoundations((prevFoundations) => {
-        const updatedFoundations = { ...prevFoundations };
-        updatedFoundations[toFoundation] = [
-          ...updatedFoundations[toFoundation],
-          card,
-        ];
-        return updatedFoundations;
-      });
-    }
+      if (canMoveCardToColumn(card, columns[toColumnIndex])) {
+        // card will be moved to column
+        // update 'columns' state; add selected card to new column
+        setColumns((prevColumns) => {
+          const updatedColumns = [...prevColumns];
+          // new array is created, containing all cards in target column plus the new card (new array created by spread operator) --> then new array is assigned to 'updatedColumns[toColumnIndex]'
+          updatedColumns[toColumnIndex] = [
+            ...updatedColumns[toColumnIndex],
+            card,
+          ];
 
-    // CARD FLIP CHECK 2: change of useState via setColumns -> rendering of the UI
-    // Check if the new top card in the "fromColumnIndex" column needs to be flipped
-    if (fromColumnIndex !== null) {
-      setColumns((prevColumns) => {
-        const updatedColumns = [...prevColumns];
-        if (updatedColumns[fromColumnIndex].length > 0) {
-          const topCard =
-            updatedColumns[fromColumnIndex][
-              updatedColumns[fromColumnIndex].length - 1
-            ];
-          if (!topCard.isFaceUp) {
-            topCard.isFaceUp = true;
+          // Delete the selected card from its orignal column (based on its columnIndex)
+          if (fromColumnIndex !== null) {
+            // updatedColumns is a copy of the current state of columns, fromColumnIndex is the specific column (it is then filtered and assigned back to 'updatedColumns[fromColumnIndex]')
+            updatedColumns[fromColumnIndex] = updatedColumns[
+              fromColumnIndex
+            ].filter((c) => c.id !== card.id); // new array is created, containing all cards in original column minus the moved card / we filter and keep only the cards that have a different id then the moved card
+
+            // Uncover the new top card if it's face down
+            if (updatedColumns[fromColumnIndex].length > 0) {
+              const topCard =
+                updatedColumns[fromColumnIndex][ // column in which the top card was deleted
+                  updatedColumns[fromColumnIndex].length - 1 // determines the index of the top card of this column (=last card in this array)
+                ];
+              if (!topCard.isFaceUp) {
+                topCard.isFaceUp = true;
+              }
+            }
           }
+          return updatedColumns;
+        });
+        // the card was moved successfully, so the selectedCard state is set back to null
+        setSelectedCard(null);
+      }
+    }
+
+    //
+    // Check if card can be moved to foundation
+    //
+    else if (toFoundation !== null) {
+      if (canMoveCardToFoundation(card, foundations[toFoundation])) {
+        // card is moved to foundation
+        setFoundations((prevFoundations) => {
+          const updatedFoundations = { ...prevFoundations }; // object {...} is used, because we have the four keys: { hearts: [], diamonds: [], clubs: [], spades: [] }
+          // new array is created, containing all cards in target foundation plus the new card (new array created by spread operator) --> then new array is assigned to 'updatedFoundations[toFoundation]'
+          updatedFoundations[toFoundation] = [
+            ...updatedFoundations[toFoundation],
+            card,
+          ];
+          return updatedFoundations;
+        });
+
+        // delete card from original column
+        if (fromColumnIndex !== null) {
+          setColumns((prevColumns) => {
+            const updatedColumns = [...prevColumns];
+            updatedColumns[fromColumnIndex] = updatedColumns[
+              fromColumnIndex
+            ].filter((c) => c.id !== card.id);
+
+            // Uncover the new top card if it's face down
+            if (updatedColumns[fromColumnIndex].length > 0) {
+              const topCard =
+                updatedColumns[fromColumnIndex][
+                  updatedColumns[fromColumnIndex].length - 1
+                ];
+              if (!topCard.isFaceUp) {
+                topCard.isFaceUp = true;
+              }
+            }
+
+            return updatedColumns;
+          });
         }
-        return updatedColumns;
+
+        // delete card from a foundation if it came from a foundation
+        if (fromFoundation !== null) {
+          setFoundations((prevFoundations) => {
+            const updatedFoundations = { ...prevFoundations };
+            updatedFoundations[fromFoundation] = updatedFoundations[
+              fromFoundation
+            ].filter((c) => c.id !== card.id);
+            return updatedFoundations;
+          });
+        }
+        // the card was moved successfully, so the selectedCard state is set back to null
+        setSelectedCard(null);
+      }
+    }
+    // card is deleted from revealedDeck if it came from revealedDeck
+    if (fromFoundation === null && fromColumnIndex === null) {
+      setRevealedDeck((prevRevealedDeck) => {
+        const updatedRevealedDeck = prevRevealedDeck.filter(
+          (c) => c.id !== card.id
+        );
+        return updatedRevealedDeck;
       });
     }
 
-    setSelectedCard(null);
+    // if (toColumnIndex !== null) {
+    //   // add card to column
+    //   setColumns((prevColumns) => {
+    //     const updatedColumns = [...prevColumns];
+    //     updatedColumns[toColumnIndex] = [
+    //       ...updatedColumns[toColumnIndex],
+    //       card,
+    //     ];
+    //     return updatedColumns;
+    //   });
+    // } else if (toFoundation !== null) {
+    //   // add card to foundation
+    //   setFoundations((prevFoundations) => {
+    //     const updatedFoundations = { ...prevFoundations };
+    //     updatedFoundations[toFoundation] = [
+    //       ...updatedFoundations[toFoundation],
+    //       card,
+    //     ];
+    //     return updatedFoundations;
+    //   });
+
+    //   // set back selectedCard
+    //   setSelectedCard(null);
+    // }
   };
 
   return (
@@ -207,7 +251,7 @@ function App() {
           </div>
           <div className="deck-section">
             {/* <h2>Deck</h2> */}
-            <div className="card-back" onClick={handleRevealCard}></div>
+            <div className="card-back" onClick={handleDeckClick}></div>
             <div className="placeholder"></div>
             <div className="revealed-deck">
               <div className="placeholder"></div>
