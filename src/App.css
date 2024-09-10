@@ -58,6 +58,7 @@ button {
   text-align: left;
   width: 30%;
   display: flex;
+  padding: 20px;
 }
 
 .columns-section {
