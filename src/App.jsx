@@ -14,7 +14,7 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [revealedDeck, setRevealedDeck] = useState([]);
   // { card, fromColumnIndex, fromFoundation }
-  const [selectedCard, setSelectedCard] = useState(null);
+  const [selectedCards, setSelectedCards] = useState([]);
   const [foundations, setFoundations] = useState({
     hearts: [],
     diamonds: [],
@@ -80,14 +80,35 @@ function App() {
     fromFoundation = null
   ) => {
     // selected card, origin, and foundation are saved in state
-    setSelectedCard({ card, fromColumnIndex, fromFoundation });
+    if (fromColumnIndex) {
+      const cards = [];
+      let cardFound = false;
+      for (let c of columns[fromColumnIndex]) {
+        if (cardFound || c.id === card.id) {
+          cardFound = true;
+          cards.push(c);
+        }
+      }
+      console.log(
+        cards.map((c) => {
+          return { card: c, fromColumnIndex, fromFoundation };
+        })
+      );
+      setSelectedCards(
+        cards.map((c) => {
+          return { card: c, fromColumnIndex, fromFoundation };
+        })
+      );
+    } else {
+      setSelectedCards([{ card, fromColumnIndex, fromFoundation }]);
+    }
   };
 
   const handleCardDrop = (toColumnIndex = null, toFoundation = null) => {
-    if (!selectedCard) return;
+    if (!selectedCards.length) return;
 
     // card, fromColumnIndex, and fromFoundation are destructured from selectedCard
-    const { card, fromColumnIndex, fromFoundation } = selectedCard;
+    const { card, fromColumnIndex, fromFoundation } = selectedCards[0];
 
     //
     // Check if card can be moved to column
@@ -101,15 +122,18 @@ function App() {
           // new array is created, containing all cards in target column plus the new card (new array created by spread operator) --> then new array is assigned to 'updatedColumns[toColumnIndex]'
           updatedColumns[toColumnIndex] = [
             ...updatedColumns[toColumnIndex],
-            card,
+            ...selectedCards.map((item) => item.card),
           ];
 
           // Delete the selected card from its orignal column (based on its columnIndex)
           if (fromColumnIndex !== null) {
             // updatedColumns is a copy of the current state of columns, fromColumnIndex is the specific column (it is then filtered and assigned back to 'updatedColumns[fromColumnIndex]')
+            const selectedRootCardIndex = updatedColumns[
+              fromColumnIndex
+            ].findIndex((c) => c.id === card.id);
             updatedColumns[fromColumnIndex] = updatedColumns[
               fromColumnIndex
-            ].filter((c) => c.id !== card.id); // new array is created, containing all cards in original column minus the moved card / we filter and keep only the cards that have a different id then the moved card
+            ].filter((_, index) => index < selectedRootCardIndex); // new array is created, containing all cards in original column minus the moved card / we filter and keep only the cards that have a different id then the moved card
 
             // Uncover the new top card if it's face down
             if (updatedColumns[fromColumnIndex].length > 0) {
@@ -125,7 +149,7 @@ function App() {
           return updatedColumns;
         });
         // the card was moved successfully, so the selectedCard state is set back to null
-        setSelectedCard(null);
+        setSelectedCards([]);
       }
     }
 
@@ -179,7 +203,7 @@ function App() {
           });
         }
         // the card was moved successfully, so the selectedCard state is set back to null
-        setSelectedCard(null);
+        setSelectedCards([]);
       }
     }
     // card is deleted from revealedDeck if it came from revealedDeck
@@ -221,6 +245,7 @@ function App() {
   return (
     <div className="App">
       <h1>Solitaire</h1>
+      <h2>{JSON.stringify(selectedCards)}</h2>
       {/* if game was not started yet, you see the button, otherwise the shuffled deck appears */}
       {!gameStarted ? (
         <button onClick={handlePlayButton}>Play</button>
@@ -270,7 +295,7 @@ function App() {
                   key={card.id}
                   emoji={card.emoji}
                   isFaceUp={true}
-                  isSelected={selectedCard?.card?.id === card.id}
+                  isSelected={selectedCards[0]?.card?.id === card.id}
                   onClick={() => handleCardSelect(card)}
                 ></Card>
               ))}
@@ -298,12 +323,15 @@ function App() {
                     emoji={card.emoji}
                     stackIndex={cardIndex}
                     isFaceUp={card.isFaceUp}
-                    onClick={() =>
-                      cardIndex === column.length - 1
-                        ? handleCardSelect(card, columnIndex)
-                        : null
-                    }
-                    isSelected={selectedCard?.card?.id === card.id}
+                    onClick={() => {
+                      const minSelectableIndex = columns[columnIndex].findIndex(
+                        (card) => card.isFaceUp
+                      );
+                      if (cardIndex >= minSelectableIndex) {
+                        handleCardSelect(card, columnIndex);
+                      }
+                    }}
+                    isSelected={selectedCards[0]?.card?.id === card.id}
                   ></Card>
                 ))}
               </div>
