@@ -14,7 +14,7 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [revealedDeck, setRevealedDeck] = useState([]);
   // { card, fromColumnIndex, fromFoundation }
-  const [selectedCard, setSelectedCard] = useState(null);
+  const [selectedCards, setSelectedCards] = useState([]);
   const [foundations, setFoundations] = useState({
     hearts: [],
     diamonds: [],
@@ -73,21 +73,62 @@ function App() {
 
   // Select and move Cards
   //
+
   // if null: card not from column but revealedDeck or foundation
+  // const handleCardSelect = (
+  //   card,
+  //   fromColumnIndex = null,
+  //   fromFoundation = null
+  // ) => {
+  //   // selected card, origin, and foundation are saved in state
+  //   setSelectedCards({ card, fromColumnIndex, fromFoundation });
+  // };
+
   const handleCardSelect = (
     card,
     fromColumnIndex = null,
     fromFoundation = null
   ) => {
-    // selected card, origin, and foundation are saved in state
-    setSelectedCard({ card, fromColumnIndex, fromFoundation });
+    if (fromFoundation !== null) {
+      // If the card comes from a foundation, only select this single card
+      setSelectedCards([{ ...card, fromFoundation }]);
+    } else if (fromColumnIndex !== null) {
+      // If the card comes from a column, select multiple cards (from this card to the last (top) card in the column)
+      setColumns((prevColumns) => {
+        const selectedColumn = prevColumns[fromColumnIndex];
+        //findIndex looks for the position of the specific card in the array
+        const cardIndex = selectedColumn.findIndex((c) => c.id === card.id);
+
+        // Select all cards from the selected card (cardIndex) to the last card in the column
+        const selectedCards = selectedColumn
+          .slice(cardIndex) // Select all cards from the selected card onward
+          .filter((c) => c.isFaceUp); // Ensure only face-up cards are selected
+
+        // Store the selected cards in the state
+        setSelectedCards(
+          selectedCards.map((c) => ({
+            ...c,
+            fromColumnIndex, // Include the originating column
+            fromFoundation: null, // As the cards come from a column
+          }))
+        );
+      });
+    } else {
+      // Fallback: If the card comes from another source (e.g., revealedDeck), only select the single card
+      setSelectedCards([
+        { ...card, fromColumnIndex: null, fromFoundation: null },
+      ]);
+    }
   };
 
   const handleCardDrop = (toColumnIndex = null, toFoundation = null) => {
-    if (!selectedCard) return;
+    // if (!selectedCards) return;
+    if (!selectedCards || selectedCards.length === 0) return;
+
+    const bottomCard = selectedCards[0];
 
     // card, fromColumnIndex, and fromFoundation are destructured from selectedCard
-    const { card, fromColumnIndex, fromFoundation } = selectedCard;
+    const { card, fromColumnIndex, fromFoundation } = selectedCards;
 
     //
     // Check if card can be moved to column
@@ -125,7 +166,7 @@ function App() {
           return updatedColumns;
         });
         // the card was moved successfully, so the selectedCard state is set back to null
-        setSelectedCard(null);
+        setSelectedCards(null);
       }
     }
 
@@ -179,7 +220,7 @@ function App() {
           });
         }
         // the card was moved successfully, so the selectedCard state is set back to null
-        setSelectedCard(null);
+        setSelectedCards(null);
       }
     }
     // card is deleted from revealedDeck if it came from revealedDeck
@@ -258,9 +299,7 @@ function App() {
             {deck.length > 0 ? (
               <div className="card-back" onClick={handleDrawCard}></div>
             ) : (
-              <div className="deck-placeholder" onClick={handleResetDeck}>
-                Click to reverse deck
-              </div>
+              <div className="deck-placeholder" onClick={handleResetDeck}></div>
             )}
 
             <div className="revealed-deck">
@@ -270,7 +309,7 @@ function App() {
                   key={card.id}
                   emoji={card.emoji}
                   isFaceUp={true}
-                  isSelected={selectedCard?.card?.id === card.id}
+                  isSelected={selectedCards?.card?.id === card.id}
                   onClick={() => handleCardSelect(card)}
                 ></Card>
               ))}
@@ -303,7 +342,16 @@ function App() {
                         ? handleCardSelect(card, columnIndex)
                         : null
                     }
-                    isSelected={selectedCard?.card?.id === card.id}
+                    // isSelected={selectedCards?.card?.id === card.id}
+                    // 'some' checks if at least one element in the array meets a condition: does the card in selectedCards have the same id as the current card?
+                    isSelected={selectedCards.some(
+                      (selectedCard) => selectedCard.id === card.id
+                    )} // Mark the selected cards
+                    onClick={() => {
+                      if (card.isFaceUp) {
+                        handleCardSelect(card, columnIndex); // Select the clicked card and all the ones above it
+                      }
+                    }}
                   ></Card>
                 ))}
               </div>
