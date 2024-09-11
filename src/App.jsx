@@ -7,8 +7,10 @@ import {
   canMoveCardToFoundation,
 } from "./components/moves";
 import Card from "./components/Card";
+import Login from "./components/login";
 
 function App() {
+  const [user, setUser] = useState(null);
   const [deck, setDeck] = useState([]);
   const [columns, setColumns] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
@@ -22,12 +24,36 @@ function App() {
     spades: [],
   });
 
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
+
   // to the new variable newDeck gets assigned the shuffled deck from 'getShuffledDeck' --> easier to read, inspect, debug
-  const handlePlayButton = () => {
-    setGameStarted(true);
+  // const handlePlayButton = () => {
+  //   setGameStarted(true);
+    // let-variable to slice it later
+    // let newDeck = getShuffledDeck();
+    // const newColumns = [];
+
+    const handlePlay = async () => {
+      if (user) {
+        await fetch(`http://localhost:3000/user/${user._id}/play`, {
+          method: 'PUT',
+        });
+        setGameStarted(true);
     // let-variable to slice it later
     let newDeck = getShuffledDeck();
     const newColumns = [];
+      }
+    };
+  
+    if (!user) {
+      return <Login onLogin={handleLogin} />;
+    }
+
+
+
+
 
     // 'i' will act (1) as a counter and (2) as a key component in slicing the deck
     // slice(startIndex, endIndex): new array is created from startIndex up to (but not including) endIndex
@@ -241,6 +267,9 @@ function App() {
     //   setSelectedCard(null);
     // }
   };
+
+
+
 
   return (
     <div className="App">
