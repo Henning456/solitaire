@@ -80,7 +80,7 @@ function App() {
     fromFoundation = null
   ) => {
     // selected card, origin, and foundation are saved in state
-    if (fromColumnIndex) {
+    if (fromColumnIndex !== null) {
       const cards = [];
       let cardFound = false;
       for (let c of columns[fromColumnIndex]) {
