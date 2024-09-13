@@ -178,7 +178,7 @@ function App() {
     //
     // Check if card can be moved to foundation
     //
-    else if (toFoundation !== null) {
+    else if (selectedCards.length === 1 && toFoundation !== null) {
       if (canMoveCardToFoundation(card, foundations[toFoundation])) {
         // card is moved to foundation
         setFoundations((prevFoundations) => {
