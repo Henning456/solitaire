@@ -80,7 +80,7 @@ function App() {
     fromFoundation = null
   ) => {
     // selected card, origin, and foundation are saved in state
-    if (fromColumnIndex) {
+    if (fromColumnIndex !== null) {
       const cards = [];
       let cardFound = false;
       for (let c of columns[fromColumnIndex]) {
@@ -148,6 +148,28 @@ function App() {
           }
           return updatedColumns;
         });
+
+        // delete card from a foundation if it came from a foundation
+        if (fromFoundation !== null) {
+          setFoundations((prevFoundations) => {
+            const updatedFoundations = { ...prevFoundations };
+            updatedFoundations[fromFoundation] = updatedFoundations[
+              fromFoundation
+            ].filter((c) => c.id !== card.id);
+            return updatedFoundations;
+          });
+        }
+
+        // card is deleted from revealedDeck if it came from revealedDeck
+        if (fromFoundation === null && fromColumnIndex === null) {
+          setRevealedDeck((prevRevealedDeck) => {
+            const updatedRevealedDeck = prevRevealedDeck.filter(
+              (c) => c.id !== card.id
+            );
+            return updatedRevealedDeck;
+          });
+        }
+
         // the card was moved successfully, so the selectedCard state is set back to null
         setSelectedCards([]);
       }
@@ -156,7 +178,7 @@ function App() {
     //
     // Check if card can be moved to foundation
     //
-    else if (toFoundation !== null) {
+    else if (selectedCards.length === 1 && toFoundation !== null) {
       if (canMoveCardToFoundation(card, foundations[toFoundation])) {
         // card is moved to foundation
         setFoundations((prevFoundations) => {
@@ -202,18 +224,19 @@ function App() {
             return updatedFoundations;
           });
         }
+
+        // card is deleted from revealedDeck if it came from revealedDeck
+        if (fromFoundation === null && fromColumnIndex === null) {
+          setRevealedDeck((prevRevealedDeck) => {
+            const updatedRevealedDeck = prevRevealedDeck.filter(
+              (c) => c.id !== card.id
+            );
+            return updatedRevealedDeck;
+          });
+        }
         // the card was moved successfully, so the selectedCard state is set back to null
         setSelectedCards([]);
       }
-    }
-    // card is deleted from revealedDeck if it came from revealedDeck
-    if (fromFoundation === null && fromColumnIndex === null) {
-      setRevealedDeck((prevRevealedDeck) => {
-        const updatedRevealedDeck = prevRevealedDeck.filter(
-          (c) => c.id !== card.id
-        );
-        return updatedRevealedDeck;
-      });
     }
 
     // if (toColumnIndex !== null) {
