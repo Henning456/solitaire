@@ -7,6 +7,7 @@ import {
   canMoveCardToFoundation,
 } from "./components/moves";
 import Card from "./components/Card";
+import Login from "./components/login";
 
 function App() {
   const [deck, setDeck] = useState([]);
@@ -21,6 +22,13 @@ function App() {
     clubs: [],
     spades: [],
   });
+
+  const [user, setUser] = useState(null);
+
+  const handleLogin = (username) => {
+    setUser(username);
+    //backend Zugang?
+  };
 
   // to the new variable newDeck gets assigned the shuffled deck from 'getShuffledDeck' --> easier to read, inspect, debug
   const handlePlayButton = () => {
@@ -245,6 +253,17 @@ function App() {
   return (
     <div className="App">
       <h1>Solitaire</h1>
+
+      <div>
+        {user ? (
+          <div>
+            <h1>Welcome, {user}!</h1>
+          </div>
+        ) : (
+          <Login onLogin={handleLogin} />
+        )}
+      </div>
+
       <h2>{JSON.stringify(selectedCards)}</h2>
       {/* if game was not started yet, you see the button, otherwise the shuffled deck appears */}
       {!gameStarted ? (
