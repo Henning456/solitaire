@@ -148,6 +148,28 @@ function App() {
           }
           return updatedColumns;
         });
+
+        // delete card from a foundation if it came from a foundation
+        if (fromFoundation !== null) {
+          setFoundations((prevFoundations) => {
+            const updatedFoundations = { ...prevFoundations };
+            updatedFoundations[fromFoundation] = updatedFoundations[
+              fromFoundation
+            ].filter((c) => c.id !== card.id);
+            return updatedFoundations;
+          });
+        }
+
+        // card is deleted from revealedDeck if it came from revealedDeck
+        if (fromFoundation === null && fromColumnIndex === null) {
+          setRevealedDeck((prevRevealedDeck) => {
+            const updatedRevealedDeck = prevRevealedDeck.filter(
+              (c) => c.id !== card.id
+            );
+            return updatedRevealedDeck;
+          });
+        }
+
         // the card was moved successfully, so the selectedCard state is set back to null
         setSelectedCards([]);
       }
@@ -202,18 +224,19 @@ function App() {
             return updatedFoundations;
           });
         }
+
+        // card is deleted from revealedDeck if it came from revealedDeck
+        if (fromFoundation === null && fromColumnIndex === null) {
+          setRevealedDeck((prevRevealedDeck) => {
+            const updatedRevealedDeck = prevRevealedDeck.filter(
+              (c) => c.id !== card.id
+            );
+            return updatedRevealedDeck;
+          });
+        }
         // the card was moved successfully, so the selectedCard state is set back to null
         setSelectedCards([]);
       }
-    }
-    // card is deleted from revealedDeck if it came from revealedDeck
-    if (fromFoundation === null && fromColumnIndex === null) {
-      setRevealedDeck((prevRevealedDeck) => {
-        const updatedRevealedDeck = prevRevealedDeck.filter(
-          (c) => c.id !== card.id
-        );
-        return updatedRevealedDeck;
-      });
     }
 
     // if (toColumnIndex !== null) {
