@@ -238,37 +238,11 @@ function App() {
         setSelectedCards([]);
       }
     }
-
-    // if (toColumnIndex !== null) {
-    //   // add card to column
-    //   setColumns((prevColumns) => {
-    //     const updatedColumns = [...prevColumns];
-    //     updatedColumns[toColumnIndex] = [
-    //       ...updatedColumns[toColumnIndex],
-    //       card,
-    //     ];
-    //     return updatedColumns;
-    //   });
-    // } else if (toFoundation !== null) {
-    //   // add card to foundation
-    //   setFoundations((prevFoundations) => {
-    //     const updatedFoundations = { ...prevFoundations };
-    //     updatedFoundations[toFoundation] = [
-    //       ...updatedFoundations[toFoundation],
-    //       card,
-    //     ];
-    //     return updatedFoundations;
-    //   });
-
-    //   // set back selectedCard
-    //   setSelectedCard(null);
-    // }
   };
 
   return (
     <div className="App">
       <h1>Solitaire</h1>
-      <h2>{JSON.stringify(selectedCards)}</h2>
       {/* if game was not started yet, you see the button, otherwise the shuffled deck appears */}
       {!gameStarted ? (
         <button onClick={handlePlayButton}>Play</button>
@@ -306,9 +280,7 @@ function App() {
             {deck.length > 0 ? (
               <div className="card-back" onClick={handleDrawCard}></div>
             ) : (
-              <div className="deck-placeholder" onClick={handleResetDeck}>
-                Click to reverse deck
-              </div>
+              <div className="deck-placeholder" onClick={handleResetDeck}></div>
             )}
 
             <div className="revealed-deck">
