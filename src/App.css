@@ -4,7 +4,7 @@
   color: #f0f0f0;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
-  /* font-size: 20px; */
+  font-size: 20px;
 }
 
 button {
@@ -36,7 +36,6 @@ button:hover {
 
 .foundation-section {
   display: flex;
-  /* flex: 1 1 100%; */
   justify-content: space-between;
   padding: 20px;
   width: 60%;
@@ -60,11 +59,6 @@ button:hover {
   position: relative;
   z-index: 1;
 }
-
-/* .deck-section,
-.columns-section {
-  flex: 1 1 50%;
-} */
 
 .deck-section {
   text-align: left;
@@ -94,11 +88,6 @@ button:hover {
   left: 0;
 }
 
-.column .card-back {
-  /* top: calc(30px * var(--stack-index));
-  z-index: var(--stack-index); */
-}
-
 .revealed-deck {
   position: absolute;
   flex-direction: column;
@@ -112,7 +101,6 @@ button:hover {
   left: 0;
 }
 
-/* Placeholder for decks */
 .deck-section .deck,
 .revealed-deck,
 .foundation-stack,
@@ -137,4 +125,10 @@ button:hover {
 
 .revealed-deck .placeholder {
   margin-top: 50px;
+}
+
+.reverse-icon {
+  width: 40px;
+  height: 40px;
+  margin-top: 10px;
 }

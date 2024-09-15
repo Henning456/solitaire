@@ -280,7 +280,13 @@ function App() {
             {deck.length > 0 ? (
               <div className="card-back" onClick={handleDrawCard}></div>
             ) : (
-              <div className="deck-placeholder" onClick={handleResetDeck}></div>
+              <div className="deck-placeholder" onClick={handleResetDeck}>
+                <img
+                  src="/reverse-icon.png"
+                  alt="Reverse Symbol"
+                  className="reverse-icon"
+                />
+              </div>
             )}
 
             <div className="revealed-deck">
@@ -296,10 +302,6 @@ function App() {
               ))}
             </div>
           </div>
-
-          {/* {deck.length === 0 && revealedDeck.length > 0 && (
-            <button onClick={handleResetDeck}>Reset Deck</button>
-          )} */}
 
           <div className="columns-section">
             {/* column: the current column | columnIndex: current individual column index  */}
