@@ -4,12 +4,24 @@
   color: #f0f0f0;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-size: 20px;
 }
 
 button {
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 15px 40px;
+  font-size: 20px;
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 30px;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
 .game-area {
@@ -24,7 +36,6 @@ button {
 
 .foundation-section {
   display: flex;
-  /* flex: 1 1 100%; */
   justify-content: space-between;
   padding: 20px;
   width: 60%;
@@ -48,11 +59,6 @@ button {
   position: relative;
   z-index: 1;
 }
-
-/* .deck-section,
-.columns-section {
-  flex: 1 1 50%;
-} */
 
 .deck-section {
   text-align: left;
@@ -82,11 +88,6 @@ button {
   left: 0;
 }
 
-.column .card-back {
-  /* top: calc(30px * var(--stack-index));
-  z-index: var(--stack-index); */
-}
-
 .revealed-deck {
   position: absolute;
   flex-direction: column;
@@ -100,7 +101,6 @@ button {
   left: 0;
 }
 
-/* Placeholder for decks */
 .deck-section .deck,
 .revealed-deck,
 .foundation-stack,
@@ -125,4 +125,10 @@ button {
 
 .revealed-deck .placeholder {
   margin-top: 50px;
+}
+
+.reverse-icon {
+  width: 40px;
+  height: 40px;
+  margin-top: 10px;
 }
